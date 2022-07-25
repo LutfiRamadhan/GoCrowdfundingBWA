@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 type Repository interface {
 	Save(user User) (User, error)
 	Get(user User) (User, error)
+	Update(user User) (User, error)
 }
 
 type repository struct {
@@ -35,4 +36,11 @@ func (r *repository) Get(user User) (User, error) {
 		return User{}, err
 	}
 	return response, nil
+}
+
+func (r *repository) Update(user User) (User, error) {
+	if err := r.db.Save(&user).Error; err != nil {
+		return User{}, err
+	}
+	return user, nil
 }

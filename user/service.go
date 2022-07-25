@@ -9,6 +9,8 @@ import (
 type Service interface {
 	RegisterUser(input RegisterUserInput) (User, error)
 	LoginUser(input LoginUserInput) (User, error)
+	ValidateEmail(input ValidateEmailInput) (bool, error)
+	SaveAvatar(id int, fileLoc string) (User, error)
 }
 
 type service struct {
@@ -57,4 +59,35 @@ func (s *service) LoginUser(input LoginUserInput) (User, error) {
 		return User{}, errors.New("Email/Password not match")
 	}
 	return userData, nil
+}
+
+func (s *service) ValidateEmail(input ValidateEmailInput) (bool, error) {
+	user := User{
+		Email: input.Email,
+	}
+	userData, err := s.repository.Get(user)
+	if err != nil {
+		return false, err
+	}
+	if userData.ID != 0 {
+		return false, nil
+	}
+	return true, nil
+}
+
+func (s *service) SaveAvatar(id int, fileLoc string) (User, error) {
+	user := User{
+		ID: id,
+	}
+	userData, err := s.repository.Get(user)
+	if err != nil {
+		return User{}, err
+	}
+
+	userData.ProfilePic = fileLoc
+	updatedUser, err := s.repository.Update(userData)
+	if err != nil {
+		return User{}, err
+	}
+	return updatedUser, nil
 }
