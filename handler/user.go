@@ -119,7 +119,8 @@ func (h *userHandler) UploadAvatar(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	path := "./images/" + file.Filename
+	currentUser := ctx.MustGet("currentUser").(user.User)
+	path := fmt.Sprintf("./images/%d_%s", currentUser.ID, file.Filename)
 	err = ctx.SaveUploadedFile(file, path)
 	if err != nil {
 		fmt.Println("Error upload avatar", err.Error())
@@ -127,7 +128,7 @@ func (h *userHandler) UploadAvatar(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	_, err = h.userService.SaveAvatar(1, path)
+	_, err = h.userService.SaveAvatar(currentUser.ID, path)
 	if err != nil {
 		fmt.Println("Error upload avatar", err.Error())
 		response := helper.ResponseAPI("Error upload avatar", http.StatusBadRequest, "Error", data_res)
