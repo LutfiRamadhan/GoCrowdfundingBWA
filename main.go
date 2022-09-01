@@ -20,7 +20,7 @@ func main() {
 
 	// router := gin.Default()
 
-	dsn := "host=172.25.2 user=postgres password=p4ssw0rd dbname=cfd_bwa port=5432 sslmode=disable TimeZone=Asia/Jakarta"
+	dsn := "host=127.0.0.1 user=postgres password=p4ssw0rd dbname=cfd_bwa port=5432 sslmode=disable TimeZone=Asia/Jakarta"
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal(err.Error())
@@ -44,6 +44,8 @@ func main() {
 	api.GET("/campaign", authMiddleware(authService, userService), campaignHandler.ListCampaign)
 	api.GET("/campaign/:slug", authMiddleware(authService, userService), campaignHandler.GetCampaign)
 	api.POST("/campaign", authMiddleware(authService, userService), campaignHandler.CreateCampaign)
+	api.POST("/campaign_images", authMiddleware(authService, userService), campaignHandler.CreateImage)
+	api.GET("/export_campaign", campaignHandler.ExportCampaign)
 
 	router.Run()
 }

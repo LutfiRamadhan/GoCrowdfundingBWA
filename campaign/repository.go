@@ -8,6 +8,8 @@ type Repository interface {
 	Gets(campaign Campaign) ([]Campaign, error)
 	Update(campaign Campaign) (Campaign, error)
 	Delete(campaign Campaign) error
+	CreateImage(image CampaignImages) (CampaignImages, error)
+	ResetPrimaryImage(id int) error
 }
 
 type repository struct {
@@ -33,6 +35,9 @@ func (r *repository) Get(campaign Campaign) (Campaign, error) {
 	}
 	if campaign.Slug != "" {
 		tx = tx.Where("slug = ?", campaign.Slug)
+	}
+	if campaign.UserId != 0 {
+		tx = tx.Where("user_id = ?", campaign.UserId)
 	}
 	if err := tx.Find(&response).Error; err != nil {
 		return Campaign{}, err
@@ -67,6 +72,27 @@ func (r *repository) Update(campaign Campaign) (Campaign, error) {
 
 func (r *repository) Delete(campaign Campaign) error {
 	if err := r.db.Delete(&campaign).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *repository) CreateImage(image CampaignImages) (CampaignImages, error) {
+	if err := r.db.Create(&image).Error; err != nil {
+		return CampaignImages{}, err
+	}
+	return image, nil
+}
+
+func (r *repository) UpdateImage(image CampaignImages) (CampaignImages, error) {
+	if err := r.db.Save(&image).Error; err != nil {
+		return CampaignImages{}, err
+	}
+	return image, nil
+}
+
+func (r *repository) ResetPrimaryImage(id int) error {
+	if err := r.db.Model(&CampaignImages{}).Where("campaign_id = ?", id).Update("is_primary", false).Error; err != nil {
 		return err
 	}
 	return nil

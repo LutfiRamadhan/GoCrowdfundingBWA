@@ -6,6 +6,7 @@ type Repository interface {
 	Save(user User) (User, error)
 	Get(user User) (User, error)
 	Update(user User) (User, error)
+	Gets(user User) ([]User, error)
 }
 
 type repository struct {
@@ -34,6 +35,24 @@ func (r *repository) Get(user User) (User, error) {
 	}
 	if err := tx.Find(&response).Error; err != nil {
 		return User{}, err
+	}
+	return response, nil
+}
+
+func (r *repository) Gets(user User) ([]User, error) {
+	var response []User
+	tx := r.db
+	if user.Name != "" {
+		tx = tx.Where("name = ?", user.Name)
+	}
+	if user.Email != "" {
+		tx = tx.Where("email =?", user.Email)
+	}
+	if user.Occupation != "" {
+		tx = tx.Where("occupation = ?", user.Occupation)
+	}
+	if err := tx.Find(&response).Error; err != nil {
+		return []User{}, err
 	}
 	return response, nil
 }

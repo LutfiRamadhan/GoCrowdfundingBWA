@@ -14,7 +14,13 @@ type CampaignInput struct {
 }
 
 type CampaignImageInput struct {
-	CampaignId int    `json:"campaign_id"`
-	FileName   string `json:"file_name"`
-	IsPrimary  bool   `json:"is_primary"`
+	CampaignId int `form:"campaign_id"`
+	FileName   string
+	IsPrimary  bool `form:"is_primary"`
+	UserId     int
+}
+
+type CampaignExportFilter struct {
+	UserId int    `form:"user_id"`
+	Perks  string `form:"perks"`
 }
